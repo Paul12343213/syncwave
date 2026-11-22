@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Syncwave Pro – Gemeinsam Musik hören</title>
+<meta name="description" content="Syncwave: Musik synchron mit Freunden hören. Mit Pro unbegrenzt und mit Steuerung für alle.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav>
+  <a class="logo" href="/"><svg viewBox="0 0 24 24"><path d="M3 12h2M7 7v10M11 3v18M15 8v8M19 10v4"/></svg>Syncwave</a>
+  <div><a class="l" href="#preise">Preise</a><a class="l" href="#abo">Abo verwalten</a><a class="l" href="#faq">FAQ</a></div>
+</nav>
+
+<header class="hero">
+  <h1>Gemeinsam Musik hören – <span>perfekt synchron.</span></h1>
+  <p>Raum erstellen, Code teilen, los. Deine Freunde brauchen keinen Account. Mit Syncwave Pro bekommst du unbegrenzte Zeit und volle Kontrolle für alle Pro-Mitglieder.</p>
+  <button class="btn primary big" onclick="buy(this)">Pro kaufen – 2 € / Monat</button>
+</header>
+
+<section>
+  <div class="feat">
+    <div><b>Synchron</b><span>Alle hören denselben Song an derselben Stelle.</span></div>
+    <div><b>Ohne Accounts</b><span>Name eingeben, Raumcode eintragen, fertig.</span></div>
+    <div><b>Warteschlange &amp; Playlists</b><span>Suchen, sammeln und speichern.</span></div>
+    <div><b>Jederzeit kündbar</b><span>Monatlich, ohne Mindestlaufzeit.</span></div>
+  </div>
+</section>
+
+<section id="preise">
+  <h2>Einfache Preise</h2>
+  <p class="sub">Starte kostenlos. Upgrade, wenn du mehr willst.</p>
+  <div class="plans">
+    <div class="plan"><h3>Free</h3><div class="price">0 €</div>
+      <ul><li>2 Stunden pro Woche in Gruppen</li><li>Räume erstellen &amp; beitreten</li><li>Steuerung nur als Host</li></ul></div>
+    <div class="plan pro"><h3>Pro</h3><div class="price">2 € <small>/ Monat</small></div>
+      <ul><li>Unbegrenzte Zeit in Gruppen</li><li>Songs starten &amp; hinzufügen – auch als Gast</li><li>Play, Pause, Vor, Zurück, Springen</li><li>Bis zu 3 Geräte</li></ul>
+      <button class="btn primary" onclick="buy(this)">Pro kaufen</button></div>
+  </div>
+  <div id="msg"></div>
+</section>
+
+<section id="abo">
+  <h2>Abo verwalten</h2>
+  <p class="sub">Zahlungsmethode ändern oder kündigen – mit deinem Lizenzschlüssel.</p>
+  <div class="manage"><input id="key" placeholder="Lizenzschlüssel" spellcheck="false" autocomplete="off"><button class="btn" onclick="portal()">Verwalten</button></div>
+  <div id="msg2" style="text-align:center;color:#fca5a5;min-height:24px;margin-top:10px"></div>
+</section>
+
+<section id="faq">
+  <h2>Fragen &amp; Antworten</h2><p class="sub"></p>
+  <details><summary>Wie aktiviere ich Pro?</summary><p>Nach dem Kauf bekommst du einen Lizenzschlüssel. In Syncwave klickst du auf „Schlüssel eingeben", fügst ihn ein und aktivierst ihn.</p></details>
+  <details><summary>Auf wie vielen Geräten kann ich Pro nutzen?</summary><p>Auf bis zu 3 Geräten mit demselben Schlüssel.</p></details>
+  <details><summary>Wie kündige ich?</summary><p>Oben unter „Abo verwalten" mit deinem Schlüssel. Pro läuft bis zum Ende des bezahlten Zeitraums weiter.</p></details>
+  <details><summary>Muss meine Gruppe auch Pro haben?</summary><p>Nein. Die Zeitbegrenzung gilt pro Person. Als Pro-Mitglied kannst du auch in fremden Räumen die Musik steuern.</p></details>
+</section>
+
+<footer><span>© Syncwave</span><span><a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></span></footer>
+
+<script>
+async function post(url, body, btn) {
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const j = await r.json().catch(() => ({})); if (!r.ok || !j.url) throw new Error(j.error || 'error'); return j.url;
+}
+async function buy(btn) {
+  const t = btn.textContent; btn.disabled = true; btn.textContent = 'Weiterleitung …'; document.getElementById('msg').textContent = '';
+  try { location.href = await post('/api/checkout'); }
+  catch { document.getElementById('msg').textContent = 'Der Kauf konnte nicht gestartet werden. Bitte später erneut versuchen.'; btn.disabled = false; btn.textContent = t; }
+}
+async function portal() {
+  const key = document.getElementById('key').value.trim(), m = document.getElementById('msg2'); m.textContent = '';
+  if (!key) { m.textContent = 'Bitte Lizenzschlüssel eingeben.'; return; }
+  try { location.href = await post('/api/portal', { key }); } catch { m.textContent = 'Schlüssel nicht gefunden.'; }
+}
+</script>
+</body>
+</html>
